@@ -13,7 +13,14 @@ class MedicineCard extends StatelessWidget {
     return InkWell(
       highlightColor: Colors.white,
       splashColor: Colors.grey,
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MedicineDetailsPage(),
+          ),
+        );
+      },
       child: Container(
         padding: EdgeInsets.only(
           left: 4.w,
