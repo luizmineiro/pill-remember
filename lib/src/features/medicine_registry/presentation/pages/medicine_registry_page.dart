@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:pill_reminder_app/src/features/medicine_registry/presentation/pages/components/select_time.dart';
 import 'package:pill_reminder_app/src/global_bloc.dart';
@@ -39,9 +41,19 @@ class _MedicineRegistryPageState extends State<MedicineRegistryPage> {
     _medicineRegistryBloc.dispose();
   }
 
+  List<int> makeIds(double n) {
+    var range = Random();
+    List<int> ids = [];
+    for (var i = 0; i < n; i++) {
+      ids.add(range.nextInt(1000000000));
+    }
+    return ids;
+  }
+
   @override
   Widget build(BuildContext context) {
     final GlobalBloc globalBloc = Provider.of<GlobalBloc>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
@@ -161,8 +173,76 @@ class _MedicineRegistryPageState extends State<MedicineRegistryPage> {
                         shape: const StadiumBorder(),
                       ),
                       onPressed: () {
-                        //* adiconar remedio
-                        //* validações
+                        String? medicineName;
+                        int? dosage;
+
+                        //* medicineName
+                        if (nameController.text == "") {
+                          _medicineRegistryBloc
+                              .submitError(EntryErros.nameNull);
+                          return;
+                        }
+                        if (nameController.text != "") {
+                          medicineName = nameController.text;
+                        }
+                        //* dosage
+                        if (dosageController.text == "") {
+                          dosage = 0;
+                        }
+                        if (dosageController.text != "") {
+                          dosage = int.parse(dosageController.text);
+                        }
+
+                        for (var medicine
+                            in globalBloc.getMedicineList!.value) {
+                          if (medicineName == medicine.medicineName) {
+                            _medicineRegistryBloc
+                                .submitError(EntryErros.nameDuplicate);
+                            return;
+                          }
+                        }
+
+                        if (_medicineRegistryBloc.selectIntervals!.value == 0) {
+                          _medicineRegistryBloc.submitError(
+                            EntryErros.interval,
+                          );
+                          return;
+                        }
+
+                        if (_medicineRegistryBloc.selectedTimeOfDay!.value ==
+                            'None') {
+                          _medicineRegistryBloc
+                              .submitError(EntryErros.startTime);
+                          return;
+                        }
+
+                        String medicineType = _medicineRegistryBloc
+                            .selectedMedicineType!.value
+                            .toString()
+                            .substring(13);
+                        int intervals =
+                            _medicineRegistryBloc.selectIntervals!.value;
+                        String startTime =
+                            _medicineRegistryBloc.selectedTimeOfDay!.value;
+
+                        List<int> intIds = makeIds(
+                          24 / _medicineRegistryBloc.selectIntervals!.value,
+                        );
+                        List<String> notificationIds = intIds
+                            .map(
+                              (e) => e.toString(),
+                            )
+                            .toList();
+                        MedicineModel newRegistryMedicine = MedicineModel(
+                          notificationIDs: notificationIds,
+                          medicineName: medicineName,
+                          dosage: dosage,
+                          medicineType: medicineType,
+                          interval: intervals,
+                          startTime: startTime,
+                        );
+
+                        globalBloc.updateMedicineList(newRegistryMedicine);
                       },
                       child: Center(
                         child: Text(
