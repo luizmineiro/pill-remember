@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:pill_reminder_app/src/features/medicine_registry/presentation/pages/components/select_time.dart';
-import 'package:pill_reminder_app/src/global_bloc.dart';
 import 'package:pill_reminder_app/src/src.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -31,6 +29,7 @@ class _MedicineRegistryPageState extends State<MedicineRegistryPage> {
     dosageController = TextEditingController();
     _scaffoldKey = GlobalKey<ScaffoldState>();
     _medicineRegistryBloc = MedicineRegistryBloc();
+    initializeErrorListen();
   }
 
   @override
@@ -48,6 +47,54 @@ class _MedicineRegistryPageState extends State<MedicineRegistryPage> {
       ids.add(range.nextInt(1000000000));
     }
     return ids;
+  }
+
+  void initializeErrorListen() {
+    _medicineRegistryBloc.errorState!.listen(
+      (EntryErros error) {
+        switch (error) {
+          case EntryErros.nameNull:
+            displayError(
+              'Por favor, preencha o nome do medicamento',
+            );
+            break;
+          case EntryErros.nameDuplicate:
+            displayError(
+              'Este medicamento ja existe, insira outro nome',
+            );
+            break;
+          case EntryErros.dosage:
+            displayError(
+              'Por favor, preencha a dosagem do medicamento',
+            );
+            break;
+          case EntryErros.interval:
+            displayError(
+              'Por favor, selecione um intervalo para o alerta',
+            );
+            break;
+          case EntryErros.startTime:
+            displayError(
+              'Por favor, selecione um horario inicial para seu alerta',
+            );
+          default:
+        }
+      },
+    );
+  }
+
+  void displayError(String error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: kErrorBorderColor,
+        content: Text(
+          error,
+          style: const TextStyle(
+              fontWeight: FontWeight.w700, fontSize: 14, color: Colors.black),
+        ),
+        duration: const Duration(milliseconds: 2500),
+      ),
+    );
   }
 
   @override
@@ -243,6 +290,13 @@ class _MedicineRegistryPageState extends State<MedicineRegistryPage> {
                         );
 
                         globalBloc.updateMedicineList(newRegistryMedicine);
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SuccessPage(),
+                          ),
+                        );
                       },
                       child: Center(
                         child: Text(

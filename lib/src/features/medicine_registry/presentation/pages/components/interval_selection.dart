@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pill_reminder_app/src/src.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class IntervalSelection extends StatefulWidget {
@@ -15,6 +16,8 @@ class _IntervalSelectionState extends State<IntervalSelection> {
 
   @override
   Widget build(BuildContext context) {
+    final MedicineRegistryBloc medicineRegistryBloc =
+        Provider.of<MedicineRegistryBloc>(context);
     return Padding(
       padding: EdgeInsets.only(top: 1.h),
       child: Row(
@@ -50,6 +53,7 @@ class _IntervalSelectionState extends State<IntervalSelection> {
             onChanged: (newValue) {
               setState(() {
                 _selected = newValue!;
+                medicineRegistryBloc.updateInterval(newValue);
               });
             },
           ),
