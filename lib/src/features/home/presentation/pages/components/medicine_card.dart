@@ -6,7 +6,62 @@ import 'package:pill_reminder_app/src/src.dart';
 import 'package:sizer/sizer.dart';
 
 class MedicineCard extends StatelessWidget {
-  const MedicineCard({super.key});
+  final MedicineModel medicineModel;
+  const MedicineCard({
+    super.key,
+    required this.medicineModel,
+  });
+
+  Hero makeIcon() {
+    if (medicineModel.medicineType == 'bootle') {
+      return Hero(
+        tag: medicineModel.medicineName! + medicineModel.medicineType!,
+        child: SvgPicture.asset(
+          'assets/icons/bottle.svg',
+          height: 7.h,
+          color: kOtherColor,
+        ),
+      );
+    }
+    if (medicineModel.medicineType == 'pill') {
+      return Hero(
+        tag: medicineModel.medicineName! + medicineModel.medicineType!,
+        child: SvgPicture.asset(
+          'assets/icons/pill.svg',
+          height: 7.h,
+          color: kOtherColor,
+        ),
+      );
+    }
+    if (medicineModel.medicineType == 'syringe') {
+      return Hero(
+        tag: medicineModel.medicineName! + medicineModel.medicineType!,
+        child: SvgPicture.asset(
+          'assets/icons/syringe.svg',
+          height: 7.h,
+          color: kOtherColor,
+        ),
+      );
+    }
+    if (medicineModel.medicineType == 'tablet') {
+      return Hero(
+        tag: medicineModel.medicineName! + medicineModel.medicineType!,
+        child: SvgPicture.asset(
+          'assets/icons/tablet.svg',
+          height: 7.h,
+          color: kOtherColor,
+        ),
+      );
+    }
+    return Hero(
+      tag: medicineModel.medicineName! + medicineModel.medicineType!,
+      child: Icon(
+        Icons.error,
+        color: kOtherColor,
+        size: 32.sp,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +71,21 @@ class MedicineCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const MedicineDetailsPage(),
+          PageRouteBuilder<void>(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: animation.value,
+                    child: MedicineDetailsPage(
+                      medicineModel: medicineModel,
+                    ),
+                  );
+                },
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 250),
           ),
         );
       },
@@ -38,22 +106,20 @@ class MedicineCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            SvgPicture.asset(
-              'assets/icons/pill.svg',
-              height: 7.h,
-              color: kOtherColor,
-            ),
+            makeIcon(),
             const Spacer(),
             Text(
               textAlign: TextAlign.start,
               overflow: TextOverflow.fade,
-              'Calpol',
+              medicineModel.medicineName!,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             Text(
               textAlign: TextAlign.start,
               overflow: TextOverflow.fade,
-              'A cada 8 horas',
+              medicineModel.interval == 1
+                  ? 'A cada ${medicineModel.interval} hora'
+                  : 'A cada ${medicineModel.interval} horas',
               style: Theme.of(context)
                   .textTheme
                   .labelMedium!

@@ -15,6 +15,27 @@ class GlobalBloc {
     makeMedicineList();
   }
 
+  Future removeMedicine(MedicineModel tobeRemove) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    List<String> medicineJsonList = [];
+
+    var blocList = _medicineList$!.value;
+    blocList.removeWhere(
+      (medicine) => medicine.medicineName == tobeRemove.medicineName,
+    );
+
+    if (blocList.isNotEmpty) {
+      for (var blocMedicine in blocList) {
+        String medicineJson = jsonEncode(blocMedicine.toJson());
+        medicineJsonList.add(medicineJson);
+      }
+    }
+
+    sharedUser.setStringList('medicines', medicineJsonList);
+
+    _medicineList$!.add(blocList);
+  }
+
   Future updateMedicineList(MedicineModel medicine) async {
     var blocList = _medicineList$!.value;
     blocList.add(medicine);

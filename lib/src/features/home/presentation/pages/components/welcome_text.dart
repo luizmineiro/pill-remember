@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class WelcomeText extends StatelessWidget {
-  const WelcomeText({super.key});
+  final String numberMedicine;
+  const WelcomeText({
+    super.key,
+    required this.numberMedicine,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,7 @@ class WelcomeText extends StatelessWidget {
             bottom: 1.h,
           ),
           child: Text(
-            '0',
+            numberMedicine,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),

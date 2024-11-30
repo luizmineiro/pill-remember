@@ -2,10 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:pill_reminder_app/src/src.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class MedicineDetailsPage extends StatefulWidget {
-  const MedicineDetailsPage({super.key});
+  final MedicineModel medicineModel;
+  const MedicineDetailsPage({
+    super.key,
+    required this.medicineModel,
+  });
 
   @override
   State<MedicineDetailsPage> createState() => _MedicineDetailsPageState();
@@ -14,6 +19,8 @@ class MedicineDetailsPage extends StatefulWidget {
 class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    final GlobalBloc globalBloc = Provider.of<GlobalBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalhes'),
@@ -22,9 +29,13 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
         padding: EdgeInsets.all(2.h),
         child: Column(
           children: [
-            const MainSection(),
+            MainSection(
+              medicineModel: widget.medicineModel,
+            ),
             SizedBox(height: 8.h),
-            const ExtendedSection(),
+            ExtendedSection(
+              medicineModel: widget.medicineModel,
+            ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -35,7 +46,10 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
                   shape: const StadiumBorder(),
                 ),
                 onPressed: () {
-                  openAlertBox(context);
+                  openAlertBox(
+                    context,
+                    globalBloc,
+                  );
                 },
                 child: Text(
                   'Deletar Medicamento',
@@ -52,7 +66,7 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
     );
   }
 
-  openAlertBox(BuildContext context) {
+  openAlertBox(BuildContext context, GlobalBloc globalBloc) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -86,7 +100,13 @@ class _MedicineDetailsPageState extends State<MedicineDetailsPage> {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                globalBloc.removeMedicine(widget.medicineModel);
+                Navigator.popUntil(
+                  context,
+                  ModalRoute.withName('/'),
+                );
+              },
               child: Text(
                 'OK',
                 style: Theme.of(context)
